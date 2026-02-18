@@ -115,15 +115,25 @@
       const text = textarea.value.trim();
       if (!text) return;
 
-      // Call Apps Script backend
-      google.script.run.withSuccessHandler(() => {
-        savedMsg.style.opacity = 1;
-        setTimeout(() => savedMsg.style.opacity = 0, 1200);
-      }).saveEntry(text);
-
-      textarea.value = '';
-      textarea.focus();
+      fetch("https://script.google.com/a/macros/brown.edu/s/AKfycbyaxgFIer1NcCqdOtWGYCD1pXlNICImbCTV-mwS8pxI3Fmp1-76w_DKILfSwXvifAhc/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "success") {
+          savedMsg.style.opacity = 1;
+          setTimeout(() => savedMsg.style.opacity = 0, 1200);
+          textarea.value = '';
+          textarea.focus();
+        } else {
+          alert("Error saving: " + data.message);
+        }
+      })
+      .catch(err => alert("Network error: " + err));
     }
+
   </script>
 
 </body>
