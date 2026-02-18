@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+      background: linear-gradient(to bottom, #fff6f9, #fdeaff);
+    }
+
+    .section {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .intro {
+      font-size: 26px;
+      font-weight: 600;
+    }
+
+    .spill-section {
+      flex-direction: column;
+      position: relative;
+    }
+
+    .spill-title {
+      font-size: 32px;
+      margin-bottom: 30px;
+    }
+
+    .blob {
+      width: 260px;
+      height: 180px;
+      background: #ffd9e6;
+      border-radius: 50% 40% 60% 50% / 60% 40% 60% 40%;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    textarea {
+      width: 70%;
+      height: 80px;
+      border: 2px dashed #ff8fb1;
+      background: transparent;
+      border-radius: 16px;
+      padding: 12px;
+      font-size: 16px;
+      resize: none;
+      outline: none;
+    }
+
+    .saved {
+      margin-top: 20px;
+      font-size: 18px;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- SECTION 1 -->
+  <div class="section intro" id="intro">
+    马上
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="section spill-section" id="spill">
+    <div class="spill-title">SPILL!</div>
+
+    <div class="blob">
+      <textarea id="entryBox" placeholder="type before it evaporates..."></textarea>
+    </div>
+
+    <div class="saved" id="savedMsg">Saved ✓</div>
+  </div>
+
+  <script>
+    // Auto-scroll after load
+    window.onload = function() {
+      setTimeout(() => {
+        document.getElementById("spill").scrollIntoView({ behavior: "smooth" });
+
+        // Focus after scroll
+        setTimeout(() => {
+          document.getElementById("entryBox").focus();
+        }, 800);
+      }, 1000);
+    };
+
+    const textarea = document.getElementById("entryBox");
+    const savedMsg = document.getElementById("savedMsg");
+
+    // Submit on Enter
+    textarea.addEventListener("keydown", function(e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        submitEntry();
+      }
+    });
+
+    function submitEntry() {
+      const text = textarea.value.trim();
+      if (!text) return;
+
+      // Call Apps Script backend
+      google.script.run.withSuccessHandler(() => {
+        savedMsg.style.opacity = 1;
+        setTimeout(() => savedMsg.style.opacity = 0, 1200);
+      }).saveEntry(text);
+
+      textarea.value = '';
+      textarea.focus();
+    }
+  </script>
+
+</body>
+</html>
